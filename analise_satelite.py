@@ -1,3 +1,8 @@
+# Nome do Aluno e RM da CCPQ
+# Luca Almeida Lucareli 569061 
+# Henrique Almeida Lucareli 569183 
+# Enzo Seiji Delgado Tabuchi 573156  
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
