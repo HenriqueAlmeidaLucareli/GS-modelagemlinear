@@ -6,19 +6,19 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df= pd.read_csv('./satellites.csv', sep=';')
-df = df.loc[:, ~df.columns.str.contains("^Unnamed")] #Remove colunas com valores totalmente vazios
+# =============================================================================
+# EXERCÍCIO 01 - CARREGAMENTO DA BASE DE DADOS
+# =============================================================================
+df = pd.read_csv('./satellites.csv', sep=';')
+df = df.loc[:, ~df.columns.str.contains("^Unnamed")] # Remove colunas com valores totalmente vazios
 
+print("Visualização inicial dos dados:")
 print(df.head())
 
-"""Exercício 02A - Variável Quantitativa Discreta
-
-Uma boa escolha é:
-
-Expected Lifetime (yrs.)
-
-Ela é quantitativa discreta porque normalmente assume valores inteiros (5, 10, 15 anos etc.).
-"""
+# =============================================================================
+# EXERCÍCIO 02A - VARIÁVEL QUANTITATIVA DISCRETA
+# Variável escolhida: Expected Lifetime (yrs.)
+# =============================================================================
 
 # Converter para numérico
 df["Expected Lifetime (yrs.)"] = pd.to_numeric(
@@ -26,220 +26,133 @@ df["Expected Lifetime (yrs.)"] = pd.to_numeric(
     errors="coerce"
 )
 
-dados = df["Expected Lifetime (yrs.)"].dropna()
+dados_discreta = df["Expected Lifetime (yrs.)"].dropna()
 
-freq_abs = classes.value_counts().sort_index()
-
-freq_rel = (freq_abs / len(dados)) * 100
-
-freq_acum = freq_abs.cumsum()
-
-freq_rel_acum = freq_rel.cumsum()
+# Cálculos de Frequência
+freq_abs_disc = dados_discreta.value_counts().sort_index()
+freq_rel_disc = (freq_abs_disc / len(dados_discreta)) * 100
+freq_acum_disc = freq_abs_disc.cumsum()
+freq_rel_acum_disc = freq_rel_disc.cumsum()
 
 tabela_discreta = pd.DataFrame({
-    "Massa de Lançamento (kg)": freq_abs.index,
-    "Frequência (fi)": freq_abs.values,
-    "Freq. Relativa (%)": freq_rel.values.round(2),
-    "Freq. Acumulada": freq_acum.values,
-    "Freq. Rel. Acum. (%)": freq_rel_acum.values.round(2)
+    "Expected Lifetime (Anos)": freq_abs_disc.index,
+    "Frequência (fi)": freq_abs_disc.values,
+    "Freq. Relativa (%)": freq_rel_disc.values.round(2),
+    "Freq. Acumulada": freq_acum_disc.values,
+    "Freq. Rel. Acum. (%)": freq_rel_acum_disc.values.round(2)
 })
 
+print("\n--- TABELA DE FREQUÊNCIAS: VARIÁVEL DISCRETA ---")
 print(tabela_discreta)
 
-"""Exercício 02B - Variável Quantitativa Contínua
 
-A melhor variável da base é:
+# =============================================================================
+# EXERCÍCIO 02B - VARIÁVEL QUANTITATIVA CONTÍNUA
+# Variável escolhida: Perigee (km)
+# =============================================================================
 
-Perigee (km)
-
-Ela é contínua e tem muitos valores diferentes.
-"""
-
+# Converter para numérico
 df["Perigee (km)"] = pd.to_numeric(
     df["Perigee (km)"],
     errors="coerce"
 )
 
-dados = df["Perigee (km)"].dropna()
+dados_continua = df["Perigee (km)"].dropna()
 
+# Criando as classes (10 bins)
 classes = pd.cut(
-    dados,
+    dados_continua,
     bins=10
 )
 
-freq_abs = classes.value_counts().sort_index()
-
-freq_rel = (freq_abs / len(dados)) * 100
-
-freq_acum = freq_abs.cumsum()
-
-freq_rel_acum = freq_rel.cumsum()
+# Cálculos de Frequência
+freq_abs_cont = classes.value_counts().sort_index()
+freq_rel_cont = (freq_abs_cont / len(dados_continua)) * 100
+freq_acum_cont = freq_abs_cont.cumsum()
+freq_rel_acum_cont = freq_rel_cont.cumsum()
 
 tabela_continua = pd.DataFrame({
-    "Classe": freq_abs.index.astype(str),
-    "Frequência (fi)": freq_abs.values,
-    "Freq. Relativa (%)": freq_rel.values.round(2),
-    "Freq. Acumulada": freq_acum.values,
-    "Freq. Rel. Acum. (%)": freq_rel_acum.values.round(2)
+    "Classe": freq_abs_cont.index.astype(str),
+    "Frequência (fi)": freq_abs_cont.values,
+    "Freq. Relativa (%)": freq_rel_cont.values.round(2),
+    "Freq. Acumulada": freq_acum_cont.values,
+    "Freq. Rel. Acum. (%)": freq_rel_acum_cont.values.round(2)
 })
 
+print("\n--- TABELA DE FREQUÊNCIAS: VARIÁVEL CONTÍNUA ---")
 print(tabela_continua)
 
-"""Gráfico 1 — Histograma
 
-Variável: Perigee (km)
+# =============================================================================
+# EXERCÍCIO 03 - DOIS GRÁFICOS DISTINTOS
+# =============================================================================
 
-Objetivo:
-
-Mostrar em quais altitudes os satélites estão concentrados.
-Identificar se a maioria está em órbitas baixas (LEO).
-
-
-Interpretação
-
-Observa-se uma concentração significativa de satélites em baixas altitudes orbitais, indicando predominância de missões em órbita terrestre baixa (LEO), amplamente utilizadas para comunicação, observação terrestre e internet via satélite.
-"""
-
+# Gráfico 1 — Histograma
 plt.figure(figsize=(10,6))
-
 plt.hist(
     df["Perigee (km)"].dropna(),
     bins=20,
     color='skyblue',
     edgecolor='black'
 )
-
 plt.title('Distribuição do Perigeu dos Satélites')
 plt.xlabel('Perigee (km)')
 plt.ylabel('Quantidade de Satélites')
-
 plt.grid(True)
-
 plt.show()
 
-"""Gráfico 2 — Barras
-
-Country of Operator/Owner
-
-Objetivo:
-
-Mostrar os principais tipos de missão.
-
-Interpretação
-
-Os resultados mostram forte concentração de satélites em poucos países, evidenciando a liderança tecnológica e econômica de determinadas nações na indústria espacial.
-"""
-
+# Gráfico 2 — Barras
 plt.figure(figsize=(12,6))
-
 df["Country of Operator/Owner"].value_counts().head(10).plot(
     kind='bar',
     color='green',
     edgecolor='black'
 )
-
 plt.title('Top 10 Países Operadores de Satélites')
 plt.xlabel('País')
 plt.ylabel('Quantidade de Satélites')
-
 plt.xticks(rotation=45)
-
 plt.show()
 
-"""
-Exercício 04 — Estatística Descritiva
 
-Uma boa variável para analisar é:
+# =============================================================================
+# EXERCÍCIO 04 — ESTATÍSTICA DESCRITIVA
+# =============================================================================
 
-Power (Watts)
+def estatistica_descritiva(dataframe, coluna):
+    # Isolando e limpando os dados da coluna específica
+    dados_estatistica = pd.to_numeric(dataframe[coluna], errors="coerce").dropna()
 
-ou
+    media = dados_estatistica.mean()
+    mediana = dados_estatistica.median()
+    moda = dados_estatistica.mode().iloc[0]
 
-Expected Lifetime (Years)
-
-Calcular:
-
-Tendência Central
-Média
-Mediana
-Moda
-Dispersão
-Máximo
-Mínimo
-Amplitude
-
-Amplitude=Valor M
-a
-ˊ
-ximo−Valor M
-ı
-ˊ
-nimo
-
-Variância
-Desvio padrão
-
-CV=
-M
-e
-ˊ
-dia
-Desvio Padr
-a
-~
-o
-	​
-
-×100
-
-Coeficiente de variação
-Separatrizes
-Q1
-Q2 (mediana)
-Q3
-"""
-def estatistica_descritiva(df, coluna):
-
-    dados = pd.to_numeric(df[coluna], errors="coerce").dropna()
-
-    media = dados.mean()
-    mediana = dados.median()
-    moda = dados.mode().iloc[0]
-
-    maximo = dados.max()
-    minimo = dados.min()
-
+    maximo = dados_estatistica.max()
+    minimo = dados_estatistica.min()
     amplitude = maximo - minimo
 
-    variancia = dados.var()
-    desvio_padrao = dados.std()
-
+    variancia = dados_estatistica.var()
+    desvio_padrao = dados_estatistica.std()
     coef_variacao = (desvio_padrao / media) * 100
 
-    q1 = dados.quantile(0.25)
-    q2 = dados.quantile(0.50)
-    q3 = dados.quantile(0.75)
+    q1 = dados_estatistica.quantile(0.25)
+    q2 = dados_estatistica.quantile(0.50)
+    q3 = dados_estatistica.quantile(0.75)
 
-    print(f"\nESTATÍSTICA DESCRITIVA - {coluna}")
-
+    print(f"\n--- ESTATÍSTICA DESCRITIVA: {coluna} ---")
     print(f"Média: {media:.2f}")
-    print(f"Mediana: {mediana:.2f}")
+    print(f"Mediana (Q2): {mediana:.2f}")
     print(f"Moda: {moda:.2f}")
-
-    print(f"Máximo: {maximo:.2f}")
-    print(f"Mínimo: {minimo:.2f}")
-
-    print(f"Amplitude: {amplitude:.2f}")
-
-    print(f"Variância: {variancia:.2f}")
+    print(f"Valor Máximo: {maximo:.2f}")
+    print(f"Valor Mínimo: {minimo:.2f}")
+    print(f"Amplitude Total: {amplitude:.2f}")
+    print(f"Variância Amostral: {variancia:.2f}")
     print(f"Desvio Padrão: {desvio_padrao:.2f}")
-
-    print(f"Coeficiente de Variação: {coef_variacao:.2f}%")
-
-    print(f"Q1: {q1:.2f}")
-    print(f"Q2: {q2:.2f}")
-    print(f"Q3: {q3:.2f}")
+    print(f"Coeficiente de Variação (CV): {coef_variacao:.2f}%")
+    print(f"Primeiro Quartil (Q1): {q1:.2f}")
+    print(f"Terceiro Quartil (Q3): {q3:.2f}")
 
 
+# Executando a função para as variáveis
 estatistica_descritiva(df, "Expected Lifetime (yrs.)")
 estatistica_descritiva(df, "Apogee (km)")
