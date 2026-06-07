@@ -139,7 +139,7 @@ def estatistica_descritiva(dataframe, coluna):
     q2 = dados_estatistica.quantile(0.50)
     q3 = dados_estatistica.quantile(0.75)
 
-    print(f"\n--- ESTATÍSTICA DESCRITIVA: {coluna} ---")
+    print(f"\n=--- ESTATÍSTICA DESCRITIVA: {coluna} ----")
     print(f"Média: {media:.2f}")
     print(f"Mediana (Q2): {mediana:.2f}")
     print(f"Moda: {moda:.2f}")
