@@ -90,7 +90,7 @@ A função é aplicada e testada nas variáveis:
 3. Execute o script utilizando sua IDE favorita ou pelo terminal:
 
 ```bash
-python nome_do_seu_arquivo.py
+python analise_satelite.py
 ```
 
 ## Objetivo
